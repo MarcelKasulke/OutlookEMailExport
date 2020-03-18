@@ -17,8 +17,8 @@ Option Explicit
 '-------------------------------------------------------------
 ' Optionen Skript
 '-------------------------------------------------------------
-' Dieses Outlook Makro ermöglicht die automatische Speicherung von E-Mails in Dateiverzeichnissen mit vorheriger Auswahl oder
-' in einem Standardverzeichnis. Der Pfad für das Standardverzeichnis wird durch ein externes Programm erzeugt, die Ticketfee.
+' Dieses Outlook Makro ermÃ¶glicht die automatische Speicherung von E-Mails in Dateiverzeichnissen mit vorheriger Auswahl oder
+' in einem Standardverzeichnis. Der Pfad fÃ¼r das Standardverzeichnis wird durch ein externes Programm erzeugt, die Ticketfee.
 
 'Parameter des Skriptes:
 'Email Ausgabeformat:
@@ -26,31 +26,31 @@ Option Explicit
 Const EXM_OPT_MAILFORMAT As String = "MSG"
 'Datumsformat des Filenames
 Const EXM_OPT_FILENAME_DATEFORMAT As String = "yyyy-mm-dd_hh-nn-ss"
-'Baue Dateinamen; Platzhalter: <DATE> für Datum, <SENDER> für Sender's Name, <RECEIVER> für Empfänger, <SUBJECT> für Thema/Title
+'Baue Dateinamen; Platzhalter: <DATE> fÃ¼r Datum, <SENDER> fÃ¼r Sender's Name, <RECEIVER> fÃ¼r EmpfÃ¤nger, <SUBJECT> fÃ¼r Thema/Title
 Const EXM_OPT_FILENAME_BUILD As String = "<DATE>_<SUBJECT>"
 'Nutze Browse Folder Funktion? Setze diesen Wert auf false wenn der Browsedialog nicht angezeigt werden soll. Damm werden die E-Mails in den Tagesordner gespeichert
 'Der Tagesordner erfordert ein externes Programm das die entsprechenden Pfade erzeugt
 Const EXM_OPT_USEBROWSER As Boolean = False
 'Zielordner (genutzt wenn EXM_OPT_USEBROWSER =false)
 Const EXM_OPT_TARGETFOLDER As String = "C:\"
-'Zielordner für PSC E-Mails zum speichern
-Const EXM_OPT_IM_FOLDER As String = "X:\Quirl\01_psc\"
-'Maximale Anzahl an E-Mails die ausgewählt und exportiert werden dürfen. Bitte keine sehr große Anzahl eintragen, dies sorgt unter Umständen für Probleme.
+'Zielordner fÃ¼r PSC E-Mails zum speichern
+Const EXM_OPT_IM_FOLDER As String = "X:\XXX\01_psc\"
+'Maximale Anzahl an E-Mails die ausgewÃ¤hlt und exportiert werden dÃ¼rfen. Bitte keine sehr groÃŸe Anzahl eintragen, dies sorgt unter UmstÃ¤nden fÃ¼r Probleme.
 'Empfohlen ist ein Wert zwischen 5 und 20.
 Const EXM_OPT_MAX_NO As Integer = 20
-'Email subject prefixes (wie "RE:", "FW:" etc.) die Entfernt werden sollen vor dem Speichern. Achtung es handelt sich hierbei um einen regulären Ausdruck
+'Email subject prefixes (wie "RE:", "FW:" etc.) die Entfernt werden sollen vor dem Speichern. Achtung es handelt sich hierbei um einen regulÃ¤ren Ausdruck
 'RegEx. Bsp. "\s" bedeutet Leerzeichen " ".
 Const EXM_OPT_CLEANSUBJECT_REGEX As String = "RE:\s|Re:\s|AW:\s|FW:\s|WG:\s|SV:\s|Antwort:\s"
 ' Daily Export Verzeichnis auf Desktop nutzen? Ja/Nein
 Const EXM_OPT_DAILY_DIR = False
-' Pfad der Exportdatei für Ticketfee, um IMs zu lesen
+' Pfad der Exportdatei fÃ¼r Ticketfee, um IMs zu lesen
 Const EXM_OPT_PATH_IM_FILE = "C:\temp\im.txt"
 '-------------------------------------------------------------
 
  
 
 '-------------------------------------------------------------
-' Übersetzungen der Dialoge
+' Ãœbersetzungen der Dialoge
 '-------------------------------------------------------------
 '-- English
 'Const EXM_007 = "Script terminated"
@@ -59,24 +59,24 @@ Const EXM_OPT_PATH_IM_FILE = "C:\temp\im.txt"
 '-- German
 Private Const EXM_001 As String = "Die E-Mail wurde erfolgreich abgelegt."
 Private Const EXM_002 As String = "Die E-Mail konnte nicht abgelegt werden, Grund:"
-Private Const EXM_003 As String = "Ausgewählter Pfad:"
-Private Const EXM_004 As String = "E-Mail(s) ausgewählt und erfolgreich abgelegt."
+Private Const EXM_003 As String = "AusgewÃ¤hlter Pfad:"
+Private Const EXM_004 As String = "E-Mail(s) ausgewÃ¤hlt und erfolgreich abgelegt."
 Private Const EXM_005 As String = "<FREE>"
 Private Const EXM_006 As String = "<FREE>"
 Private Const EXM_007 As String = "Script abgebrochen"
-Private Const EXM_008 As String = "Fehler aufgetreten: Sie haben mehr als [LIMIT_SELECTED_ITEMS] E-Mails ausgewählt. Die Aktion wurde beendet."
-Private Const EXM_009 As String = "Es wurde keine E-Mail ausgewählt."
+Private Const EXM_008 As String = "Fehler aufgetreten: Sie haben mehr als [LIMIT_SELECTED_ITEMS] E-Mails ausgewÃ¤hlt. Die Aktion wurde beendet."
+Private Const EXM_009 As String = "Es wurde keine E-Mail ausgewÃ¤hlt."
 Private Const EXM_010 As String = "Es ist ein Fehler aufgetreten: es war keine Email im Fokus, so dass die Ablage nicht erfolgen konnte."
 Private Const EXM_011 As String = "Es ist ein Fehler aufgetreten:"
 Private Const EXM_012 As String = "Die Aktion wurde beendet."
-Private Const EXM_013 As String = "Ausgewähltes Outlook-Dokument ist keine E-Mail"
+Private Const EXM_013 As String = "AusgewÃ¤hltes Outlook-Dokument ist keine E-Mail"
 Private Const EXM_014 As String = "Datei existiert bereits"
 Private Const EXM_015 As String = "<FREE>"
-Private Const EXM_016 As String = "Bitte wählen Sie den Ordner zum Exportieren:"
+Private Const EXM_016 As String = "Bitte wÃ¤hlen Sie den Ordner zum Exportieren:"
 Private Const EXM_017 As String = "Fehler beim Exportieren aufgetreten"
 Private Const EXM_018 As String = "Export erfolgreich"
 Private Const EXM_019 As String = "Bei [NO_OF_FAILURES] E-Mail(s) ist ein Fehler aufgetreten:"
-Private Const EXM_020 As String = "[NO_OF_SELECTED_ITEMS] E-Mail(s) wurden ausgewählt und [NO_OF_SUCCESS_ITEMS] E-Mail(s) erfolgreich abgelegt."
+Private Const EXM_020 As String = "[NO_OF_SELECTED_ITEMS] E-Mail(s) wurden ausgewÃ¤hlt und [NO_OF_SUCCESS_ITEMS] E-Mail(s) erfolgreich abgelegt."
 '-------------------------------------------------------------
  
  
@@ -129,7 +129,7 @@ Public Sub ExportEmailToDrive()
     '-------------------------------------
     dot = "."
     strDate = Now
-    'Erzeuge Datumsstring für Ordner die über Tasktrack erstellt wurden/Arbeitsverzeichnis
+    'Erzeuge Datumsstring fÃ¼r Ordner die Ã¼ber Tasktrack erstellt wurden/Arbeitsverzeichnis
     sysuser = CStr(Environ("USER"))
     strDate = "C:\Users\sysuser\Desktop\" & (Year(strDate)) & dot & Format(Month(strDate), "00") & dot & Format(Day(strDate), "00")
         
@@ -145,15 +145,15 @@ Public Sub ExportEmailToDrive()
         End If
     Else
         'strBackupPath = EXM_OPT_TARGETFOLDER
-        'Lese Umgebungsvariable für IM-Tickets, dieser Wert fird über die Ticketfee gesetzt
+        'Lese Umgebungsvariable fÃ¼r IM-Tickets, dieser Wert fird Ã¼ber die Ticketfee gesetzt
         'Hier kommt man hin wenn der FileBrowser aus ist, kein Dialog wird eingeblendet
     'strBackupPath = CStr(Environ("IM"))
     strErrorMsg = Mid(strBackupPath, 16, 9999)
  
     End If
-    ' Wenn bei aktiviertem FileBrowser Abbrechen/Schließen geklickt wird dann werden die Daten hierhin gespeichert
+    ' Wenn bei aktiviertem FileBrowser Abbrechen/SchlieÃŸen geklickt wird dann werden die Daten hierhin gespeichert
     'If strBackupPath = " " Then strBackupPath = strDate
-    ' Obiger Eintrag gilt nur für den Tasktracker
+    ' Obiger Eintrag gilt nur fÃ¼r den Tasktracker
     'Then GoTo ExitScript
     If Len(Trim(strBackupPath)) = 0 Then
         If EXM_OPT_DAILY_DIR = False Then
@@ -165,8 +165,8 @@ Public Sub ExportEmailToDrive()
     End If
     If (Not Right(strBackupPath, 1) = "\") Then strBackupPath = strBackupPath & "\"
     '-------------------------------------
-    ' Prozess der den Fokus auf die ausgewählten E-Mails order Ordner legt
-    ' Case 2 funktioniert normalerweise auch bei geöffneten E-Mails aber leider nicht zuverlässig, machmal lassen sich die E-Mails nicht mehr öffnen
+    ' Prozess der den Fokus auf die ausgewÃ¤hlten E-Mails order Ordner legt
+    ' Case 2 funktioniert normalerweise auch bei geÃ¶ffneten E-Mails aber leider nicht zuverlÃ¤ssig, machmal lassen sich die E-Mails nicht mehr Ã¶ffnen
     '-------------------------------------
  
     Set myExplorer = Application.ActiveExplorer
@@ -233,7 +233,7 @@ ErrorHandler:
     Resume ExitScript
 End Sub
  
-'Hier wird das Speichern der E-Mails durchgeführt
+'Hier wird das Speichern der E-Mails durchgefÃ¼hrt
 
 Private Function ProcessEmail(myItem As Object, strBackupPath As String) As Variant
     'Saves the e-mail on the drive by using the provided path.
